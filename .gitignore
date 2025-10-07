@@ -1,0 +1,6 @@
+prod
+node_modules
+review.md
+content/**/*
+!.gitkeep
+fcc-review-pages.pdf

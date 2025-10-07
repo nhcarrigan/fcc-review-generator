@@ -1,0 +1,29 @@
+{
+  "name": "fcc-review-generator",
+  "version": "1.0.0",
+  "description": "A quick tool that aggregates all of the review pages from freeCodeCamp into a single page.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "postinstall": "pnpx puppeteer browsers install chrome",
+    "start": "tsx src/index.ts",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint src --max-warnings 0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.18.0",
+  "devDependencies": {
+    "@nhcarrigan/eslint-config": "5.2.0",
+    "@nhcarrigan/typescript-config": "4.0.0",
+    "@types/node": "24.7.0",
+    "eslint": "9.37.0",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "md-to-pdf": "5.2.4"
+  }
+}

@@ -36,7 +36,9 @@ const rollupFiles = async(
   outputFile: string,
 ): Promise<void> => {
   try {
+    console.log("Process started...");
     await writeFile(outputFile, `${starterText}\n`);
+    console.log("Reading content directory...");
     const files = await readDirectoryRecursively(inputDirectory);
     for (const file of files) {
       if (file === ".gitkeep") {
@@ -49,7 +51,6 @@ const rollupFiles = async(
           trim();
         // Title is in front matter
         const title = /^title: (?<title>.*)/m.exec(content)?.groups?.title;
-        console.log(title);
         const strippedFccHeadings = strippedFrontmatter.
           replace(/^#+ --.*--/, "").
           trim();
@@ -66,6 +67,7 @@ const rollupFiles = async(
 };
 
 const createPdf = async(inputPath: string): Promise<void> => {
+  console.log("Creating PDF...");
   const pdf = await mdToPdf({ path: inputPath }, options);
   console.log("PDF created!");
   await writeFile("./fcc-review-pages.pdf", pdf.content);

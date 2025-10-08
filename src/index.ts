@@ -17,11 +17,13 @@ import order from "../data/order.json" assert { type: "json" };
 import { options } from "./config/options.js";
 import { starterText } from "./config/text.js";
 
+/* eslint-disable -- Because we do not commit the order object, the CI cannot process this declaration.*/
 const flattenedOrder: Array<string> = order.chapters.flatMap((chapter) => {
   return chapter.modules.flatMap((module) => {
     return module.blocks;
   });
 });
+/* eslint-enable */
 
 const readDirectoryRecursively = async(
   directory: string,

@@ -2,6 +2,9 @@
     "extends": "@nhcarrigan/typescript-config",
     "compilerOptions": {
         "outDir": "./prod",
-        "rootDir": "./src"
+        "rootDir": "./src",
+        "resolveJsonModule": true,
+        "module": "esnext",
+        "lib": ["es2024"]
     },
 }

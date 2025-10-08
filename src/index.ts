@@ -13,8 +13,15 @@ import {
 } from "node:fs/promises";
 import { join } from "node:path";
 import { mdToPdf } from "md-to-pdf";
+import order from "../data/order.json" assert { type: "json" };
 import { options } from "./config/options.js";
 import { starterText } from "./config/text.js";
+
+const flattenedOrder: Array<string> = order.chapters.flatMap((chapter) => {
+  return chapter.modules.flatMap((module) => {
+    return module.blocks;
+  });
+});
 
 const readDirectoryRecursively = async(
   directory: string,
@@ -31,6 +38,14 @@ const readDirectoryRecursively = async(
   return files.flat();
 };
 
+const sortFiles = (a: string, b: string): number => {
+  const aDashedName = a.split("/").at(1);
+  const bDashedName = b.split("/").at(1);
+  const aIndex = flattenedOrder.indexOf(aDashedName ?? "");
+  const bIndex = flattenedOrder.indexOf(bDashedName ?? "");
+  return aIndex - bIndex;
+};
+
 const rollupFiles = async(
   inputDirectory: string,
   outputFile: string,
@@ -39,7 +54,10 @@ const rollupFiles = async(
     console.log("Process started...");
     await writeFile(outputFile, `${starterText}\n`);
     console.log("Reading content directory...");
-    const files = await readDirectoryRecursively(inputDirectory);
+    const unsortedFiles = await readDirectoryRecursively(inputDirectory);
+    console.log(unsortedFiles);
+    const files = unsortedFiles.toSorted(sortFiles);
+    console.log("Files found, processing...");
     for (const file of files) {
       if (file === ".gitkeep") {
         continue;

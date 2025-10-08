@@ -2,5 +2,6 @@ prod
 node_modules
 review.md
 content/**/*
+data/**/*
 !.gitkeep
 fcc-review-pages.pdf

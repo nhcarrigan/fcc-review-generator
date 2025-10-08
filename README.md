@@ -6,8 +6,9 @@ This tool allows you to compile all of freeCodeCamp's review lessons into a sing
 
 1. Clone the repo, `pnpm install`.
 2. Go to the freeCodeCamp repo, copy all of the review blocks into the `content` directory here. Nested directories are fine, we walk the file tree recursively. Only markdown files will be parsed.
-3. Run `pnpm start` to start reading the files, compiling them into a single doc, and turning that doc into a PDF.
-4. Profit.
+3. Go to the freeCodeCamp repo, copy the Full Stack order in `/curriculum/structure/superblocks/fullstack.json` to the `data/order.json` here.
+4. Run `pnpm start` to start reading the files, compiling them into a single doc, and turning that doc into a PDF.
+5. Profit.
 
 ## Feedback and Bugs
 

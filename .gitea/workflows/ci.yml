@@ -28,6 +28,9 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
+      - name: Create fake order.json
+        run: echo '{"chapters":[{"modules":[{"blocks":["responsive-web-design",]}]}]}' > ./data/order.json
+
       - name: Lint Source Files
         run: pnpm run lint
 

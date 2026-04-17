@@ -4,13 +4,7 @@
  * @author Naomi Carrigan
  */
 
-import {
-  readFile,
-  appendFile,
-  writeFile,
-  readdir,
-  unlink,
-} from "node:fs/promises";
+import { readFile, writeFile, readdir, unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { mdToPdf } from "md-to-pdf";
 import order from "../data/order.json" assert { type: "json" };
@@ -46,38 +40,59 @@ const sortFiles = (a: string, b: string): number => {
   return aIndex - bIndex;
 };
 
+interface FileEntry {
+  body:  string;
+  title: string;
+}
+
+const slugify = (text: string): string => {
+  return text.
+    toLowerCase().
+    replaceAll(/[^\w\s-]/gu, "").
+    replaceAll(/\s+/gu, "-");
+};
+
+const processFile = async(file: string): Promise<FileEntry> => {
+  const content = await readFile(file, "utf8");
+  const titleMatch = /^title: (?<title>.*)/mu.exec(content);
+  const title = titleMatch?.groups?.title ?? "Unknown";
+  const body = content.
+    replace(/^---\n[\S\s]*?\n---\n/u, "").
+    trim().
+    replace(/^#+ --.*--/u, "").
+    trim().
+    replaceAll(/^:::.*$/gmu, "").
+    trim();
+  return { body, title };
+};
+
 const rollupFiles = async(
   inputDirectory: string,
   outputFile: string,
 ): Promise<void> => {
   try {
     console.log("Process started...");
-    await writeFile(outputFile, `${starterText}\n`);
     console.log("Reading content directory...");
     const unsortedFiles = await readDirectoryRecursively(inputDirectory);
-    console.log(unsortedFiles);
     const files = unsortedFiles.toSorted(sortFiles);
     console.log("Files found, processing...");
-    for (const file of files) {
-      if (file === ".gitkeep") {
-        continue;
-      }
-      if (file.endsWith(".md")) {
-        const content = await readFile(file, "utf8");
-        const strippedFrontmatter = content.
-          replace(/^---\n[\S\s]*?\n---\n/, "").
-          trim();
-        // Title is in front matter
-        const title = /^title: (?<title>.*)/m.exec(content)?.groups?.title;
-        const strippedFccHeadings = strippedFrontmatter.
-          replace(/^#+ --.*--/, "").
-          trim();
-        await appendFile(
-          outputFile,
-          `---\n\n# ${title ?? "Unknown"}\n${strippedFccHeadings}\n\n`,
-        );
-      }
-    }
+    const mdFiles = files.filter((file) => {
+      return file.endsWith(".md");
+    });
+    const entries = await Promise.all(
+      mdFiles.map(async(file) => {
+        return await processFile(file);
+      }),
+    );
+    const tocLines = entries.map(({ title }) => {
+      return `- [${title}](#${slugify(title)})`;
+    });
+    const toc = `## Table of Contents\n\n${tocLines.join("\n")}\n\n---`;
+    const sections = entries.map(({ body, title }) => {
+      return `---\n\n# ${title}\n\n${body}\n\n`;
+    });
+
+    await writeFile(outputFile, `${starterText}\n${toc}\n\n${sections.join("")}`);
     console.log(`Successfully rolled up files into ${outputFile}`);
   } catch (error) {
     console.error("Error rolling up files:", error);
